@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Monitor Canvas in One Browser Window</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: black;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            // Calculate canvas size to cover both monitors
+            const width = window.screen.width;  // Total width of both monitors
+            const height = window.screen.height;  // Height of the screen
+
+            // Resize the canvas to cover the screen width and height
+            canvas.width = width * 2;  // Assuming both monitors have the same resolution, double the width
+            canvas.height = height;
+
+            // Redraw the canvas after resizing
+            draw();
+        }
+
+        // Example drawing function for the canvas
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Drawing on the first monitor
+            ctx.fillStyle = 'red';
+            ctx.fillRect(50, 50, 200, 200);
+
+            // Drawing on the second monitor (adjust x position)
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(canvas.width / 2 + 50, 50, 200, 200);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dual Monitor Canvas in One Browser Window</title>
+    <title>Dual Monitor Fullscreen Canvas</title>
     <style>
         body, html {
             margin: 0;
@@ -11,46 +11,78 @@
             overflow: hidden;
             background: black;
         }
-        canvas {
+        #canvas1, #canvas2 {
             display: block;
+            width: 100vw;
+            height: 100vh;
         }
     </style>
 </head>
 <body>
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas1"></canvas>
 
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+        // Initializing both canvases
+        const canvas1 = document.getElementById('canvas1');
+        const ctx1 = canvas1.getContext('2d');
 
         function resizeCanvas() {
-            // Calculate canvas size to cover both monitors
-            const width = window.screen.width;  // Total width of both monitors
-            const height = window.screen.height;  // Height of the screen
-
-            // Resize the canvas to cover the screen width and height
-            canvas.width = width * 2;  // Assuming both monitors have the same resolution, double the width
-            canvas.height = height;
-
-            // Redraw the canvas after resizing
-            draw();
-        }
-
-        // Example drawing function for the canvas
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Drawing on the first monitor
-            ctx.fillStyle = 'red';
-            ctx.fillRect(50, 50, 200, 200);
-
-            // Drawing on the second monitor (adjust x position)
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(canvas.width / 2 + 50, 50, 200, 200);
+            canvas1.width = window.innerWidth;
+            canvas1.height = window.innerHeight;
         }
 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
+
+        // Example drawing function for canvas1
+        function draw() {
+            ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+            ctx1.fillStyle = 'red';
+            ctx1.fillRect(50, 50, 200, 200);
+        }
+        draw();
+
+        // Fullscreen function for canvas1 (main monitor)
+        function goFullscreen() {
+            if (canvas1.requestFullscreen) {
+                canvas1.requestFullscreen();
+            } else if (canvas1.mozRequestFullScreen) { // Firefox
+                canvas1.mozRequestFullScreen();
+            } else if (canvas1.webkitRequestFullscreen) { // Chrome, Safari, Opera
+                canvas1.webkitRequestFullscreen();
+            } else if (canvas1.msRequestFullscreen) { // IE/Edge
+                canvas1.msRequestFullscreen();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'f') {
+                goFullscreen();
+                openSecondMonitorWindow();
+            }
+        });
+
+        // Open second window for the second monitor
+        let secondWindow;
+        function openSecondMonitorWindow() {
+            secondWindow = window.open('', '', 'width=1920,height=1080');
+            secondWindow.document.write(`
+                <canvas id="canvas2"></canvas>
+                <script>
+                    const canvas2 = document.getElementById('canvas2');
+                    const ctx2 = canvas2.getContext('2d');
+                    canvas2.width = window.innerWidth;
+                    canvas2.height = window.innerHeight;
+
+                    function draw() {
+                        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+                        ctx2.fillStyle = 'blue';
+                        ctx2.fillRect(100, 100, 300, 300);
+                    }
+                    draw();
+                </script>
+            `);
+        }
     </script>
 </body>
 </html>
